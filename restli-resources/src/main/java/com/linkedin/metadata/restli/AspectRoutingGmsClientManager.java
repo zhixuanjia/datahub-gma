@@ -21,23 +21,27 @@ public class AspectRoutingGmsClientManager {
   private static class RoutingAspectConfig {
     private final BaseAspectRoutingGmsClient gmsClient;
     private final String setterName;
-    public RoutingAspectConfig(BaseAspectRoutingGmsClient gmsClient, String setterName) {
+    private final String entityType;
+    public RoutingAspectConfig(BaseAspectRoutingGmsClient gmsClient, String setterName, String entityType) {
       this.gmsClient = gmsClient;
       this.setterName = setterName;
+      this.entityType = entityType;
     }
   }
 
-  public <ASPECT extends RecordTemplate> void registerRoutingGmsClient(@Nonnull Class<ASPECT> routingAspectClass,
-      @Nonnull String routingAspectSetterName, @Nonnull BaseAspectRoutingGmsClient routingGmsClient) {
+  public <ASPECT extends RecordTemplate> void registerRoutingGmsClient(
+      @Nonnull Class<ASPECT> routingAspectClass,
+      @Nonnull String routingAspectSetterName,
+      @Nonnull String entityType,
+      @Nonnull BaseAspectRoutingGmsClient routingGmsClient) {
     log.info("Registering routing gms clients: {}, {}, {}", routingAspectClass.getCanonicalName(),
         routingAspectSetterName, routingGmsClient);
     _routingGmsClientConfigMap.put(routingAspectClass,
-        new RoutingAspectConfig(routingGmsClient, routingAspectSetterName));
+        new RoutingAspectConfig(routingGmsClient, routingAspectSetterName, entityType));
   }
 
-  public <ASPECT extends RecordTemplate> BaseAspectRoutingGmsClient getRoutingGmsClient(
-      @Nonnull Class<ASPECT> routingAspectClass) {
-    return _routingGmsClientConfigMap.getOrDefault(routingAspectClass, new RoutingAspectConfig(null, null)).gmsClient;
+  public <ASPECT extends RecordTemplate> BaseAspectRoutingGmsClient getRoutingGmsClient(@Nonnull Class<ASPECT> routingAspectClass) {
+    return _routingGmsClientConfigMap.getOrDefault(routingAspectClass, new RoutingAspectConfig(null, null, null)).gmsClient;
   }
 
   /**
@@ -46,7 +50,7 @@ public class AspectRoutingGmsClientManager {
    * @return the setter method name of the routing aspect on the entity value object.
    */
   public <ASPECT extends RecordTemplate> String getRoutingAspectSetterName(@Nonnull Class<ASPECT> routingAspectClass) {
-    return _routingGmsClientConfigMap.getOrDefault(routingAspectClass, new RoutingAspectConfig(null, null)).setterName;
+    return _routingGmsClientConfigMap.getOrDefault(routingAspectClass, new RoutingAspectConfig(null, null, null)).setterName;
   }
 
   /**
@@ -66,6 +70,16 @@ public class AspectRoutingGmsClientManager {
   public List<BaseAspectRoutingGmsClient> getRegisteredRoutingGmsClients() {
     return _routingGmsClientConfigMap.values().stream().map(routingAspectConfig -> routingAspectConfig.gmsClient).collect(
         Collectors.toList());
+  }
+
+  /**
+   * get all the registered gms clients.
+   * @return a list of {@link BaseAspectRoutingGmsClient}
+   */
+  public List<BaseAspectRoutingGmsClient> getRegisteredRoutingGmsClients(String entityType) {
+    return _routingGmsClientConfigMap.values().stream()
+        .filter(routingAspectConfig -> routingAspectConfig.entityType.equals(entityType))
+        .map(routingAspectConfig -> routingAspectConfig.gmsClient).collect(Collectors.toList());
   }
 
   @Override

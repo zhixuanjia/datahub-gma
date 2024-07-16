@@ -154,13 +154,10 @@ public class BaseAspectRoutingResourceTest extends BaseEngineTest {
     _mockAspectFooGmsClient = mock(BaseAspectRoutingGmsClient.class);
     _mockAspectAttributeGmsClient = mock(BaseAspectRoutingGmsClient.class);
     _mockAspectBazGmsClient = mock(BaseAspectRoutingGmsClient.class);
-    when(_mockAspectFooGmsClient.getEntityType()).thenReturn(FooUrn.ENTITY_TYPE);
-    when(_mockAspectAttributeGmsClient.getEntityType()).thenReturn(FooUrn.ENTITY_TYPE);
-    when(_mockAspectBazGmsClient.getEntityType()).thenReturn(BazUrn.ENTITY_TYPE);
     _mockLocalDAO = mock(BaseLocalDAO.class);
-    _aspectRoutingGmsClientManager.registerRoutingGmsClient(AspectFoo.class, "setFoo", _mockAspectFooGmsClient);
-    _aspectRoutingGmsClientManager.registerRoutingGmsClient(AspectAttributes.class, "setAttributes", _mockAspectAttributeGmsClient);
-    _aspectRoutingGmsClientManager.registerRoutingGmsClient(AspectBaz.class, "setBaz", _mockAspectBazGmsClient);
+    _aspectRoutingGmsClientManager.registerRoutingGmsClient(AspectFoo.class, "setFoo", FooUrn.ENTITY_TYPE, _mockAspectFooGmsClient);
+    _aspectRoutingGmsClientManager.registerRoutingGmsClient(AspectAttributes.class, "setAttributes", FooUrn.ENTITY_TYPE, _mockAspectAttributeGmsClient);
+    _aspectRoutingGmsClientManager.registerRoutingGmsClient(AspectBaz.class, "setBaz", BazUrn.ENTITY_TYPE, _mockAspectBazGmsClient);
   }
 
   @Test
@@ -452,7 +449,6 @@ public class BaseAspectRoutingResourceTest extends BaseEngineTest {
     assertTrue(backfillResult.getEntities().get(1).getAspects().contains(AspectFoo.class.getCanonicalName()));
     assertTrue(backfillResult.getEntities().get(1).getAspects().contains(AspectAttributes.class.getCanonicalName()));
 
-    verify(_mockAspectBazGmsClient, times(1)).getEntityType();
     verify(_mockAspectBazGmsClient, never()).backfill(any());
   }
 
@@ -516,7 +512,6 @@ public class BaseAspectRoutingResourceTest extends BaseEngineTest {
     assertTrue(backfillResult.getEntities().get(1).getAspects().contains(AspectFoo.class.getCanonicalName()));
     assertTrue(backfillResult.getEntities().get(1).getAspects().contains(AspectAttributes.class.getCanonicalName()));
 
-    verify(_mockAspectBazGmsClient, times(1)).getEntityType();
     verify(_mockAspectBazGmsClient, never()).backfill(any());
   }
 

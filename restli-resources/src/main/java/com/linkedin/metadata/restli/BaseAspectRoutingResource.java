@@ -377,9 +377,8 @@ public abstract class BaseAspectRoutingResource<
   @Nonnull
   private BackfillResult backfillWithDefault(@Nonnull final Set<URN> urns, @Nonnull final String entityType) {
     try {
-      List<BackfillResult> backfillResults = getAspectRoutingGmsClientManager().getRegisteredRoutingGmsClients()
+      List<BackfillResult> backfillResults = getAspectRoutingGmsClientManager().getRegisteredRoutingGmsClients(entityType)
           .stream()
-          .filter(baseAspectRoutingGmsClient -> entityType.equals(baseAspectRoutingGmsClient.getEntityType()))
           .map(baseAspectRoutingGmsClient -> baseAspectRoutingGmsClient.backfill(urns))
           .collect(Collectors.toList());
       return merge(null, backfillResults.toArray(new BackfillResult[0]));
